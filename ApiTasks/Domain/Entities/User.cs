@@ -31,7 +31,7 @@ namespace Domain.Entities
 
         public ICollection<Workspace>? Workspaces { get; set; }
         public string? RefreshToken { get; set; }
-        public string? RefreshTokenExpirationTime { get; set; }
+        public DateTime? RefreshTokenExpirationTime { get; set; }
 
     }
 }
