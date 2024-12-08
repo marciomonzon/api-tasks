@@ -1,4 +1,5 @@
-﻿using Application.UsersUseCase.Commands;
+﻿using Application.Response;
+using Application.UsersUseCase.Commands;
 using Application.UsersUseCase.ViewModels;
 using Domain.Entities;
 using Infrastructure.Persistence;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace Application.UsersUseCase.Handlers
 {
-    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, UserInfoViewModel>
+    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ResponseBase<UserInfoViewModel>>
     {
         private readonly TasksDbContext _dbContext;
 
@@ -15,7 +16,7 @@ namespace Application.UsersUseCase.Handlers
             _dbContext = dbContext;
         }
 
-        public async Task<UserInfoViewModel> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        public async Task<ResponseBase<UserInfoViewModel>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             var user = new User()
             {
@@ -31,15 +32,19 @@ namespace Application.UsersUseCase.Handlers
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
 
-            var userInfo = new UserInfoViewModel()
+            var userInfo = new ResponseBase<UserInfoViewModel>()
             {
-                Name = user.Name,
-                Email = user.Email,
-                Surname = user.Surname,
-                Username = user.Username,
-                RefreshToken = user.RefreshToken,
-                RefreshTokenExpirationTime = user.RefreshTokenExpirationTime,
-                TokenJwt = Guid.NewGuid().ToString()
+                ResponseInfo = null,
+                Value = new()
+                {
+                    Name = user.Name,
+                    Email = user.Email,
+                    Surname = user.Surname,
+                    Username = user.Username,
+                    RefreshToken = user.RefreshToken,
+                    RefreshTokenExpirationTime = user.RefreshTokenExpirationTime,
+                    TokenJwt = Guid.NewGuid().ToString()
+                }
             };
 
             return userInfo;
