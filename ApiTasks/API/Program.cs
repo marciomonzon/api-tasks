@@ -8,6 +8,7 @@ builder.AddDatabase();
 builder.AddMediatrCommands();
 builder.AddFluentValidationValidators();
 builder.AddMapper();
+builder.AddSwaggerDocs();
 
 var app = builder.Build();
 

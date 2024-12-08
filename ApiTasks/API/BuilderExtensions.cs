@@ -5,6 +5,8 @@ using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Application.Mappings;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 namespace API
 {
@@ -14,7 +16,31 @@ namespace API
         {
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+        }
+
+        public static void AddSwaggerDocs(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "Tasks App",
+                    Description = "Tasks application based on Trello and made with ASP.NET",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Exemplo de página de contato",
+                        Url = new Uri("https://example.com/contact") 
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "Example of license page",
+                        Url = new Uri("https://example.com/license")
+                    }
+                });
+                var xmlFileName = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFileName));
+            });
         }
 
         public static void AddDatabase(this WebApplicationBuilder builder)
