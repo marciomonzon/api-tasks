@@ -4,6 +4,7 @@ using FluentValidation.AspNetCore;
 using FluentValidation;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Application.Mappings;
 
 namespace API
 {
@@ -20,7 +21,7 @@ namespace API
         {
             var configuration = builder.Configuration;
             builder.Services.AddDbContext<TasksDbContext>(options => options
-                .UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+                            .UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
         }
 
         public static void AddMediatrCommands(this WebApplicationBuilder builder)
@@ -33,6 +34,11 @@ namespace API
         {
             builder.Services.AddValidatorsFromAssemblyContaining<CreateUserCommandValidator>();
             builder.Services.AddFluentValidationAutoValidation();
+        }
+
+        public static void AddMapper(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddAutoMapper(typeof(ProfileMappings).Assembly);
         }
     }
 }

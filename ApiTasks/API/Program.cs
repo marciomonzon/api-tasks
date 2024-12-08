@@ -5,10 +5,9 @@ var configuration = builder.Configuration;
 
 builder.AddServices();
 builder.AddDatabase();
-
 builder.AddMediatrCommands();
-
 builder.AddFluentValidationValidators();
+builder.AddMapper();
 
 var app = builder.Build();
 
