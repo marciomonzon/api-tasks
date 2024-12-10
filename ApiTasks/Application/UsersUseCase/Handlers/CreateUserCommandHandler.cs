@@ -32,7 +32,7 @@ namespace Application.UsersUseCase.Handlers
             await _dbContext.SaveChangesAsync();
 
             var userMapped = _mapper.Map<UserInfoViewModel>(user);
-            userMapped.RefreshToken = _authService.GenerateJWT(user.Email!, user.Username!);
+            userMapped.TokenJwt = _authService.GenerateJWT(user.Email!, user.Username!);
 
             var userInfo = new ResponseBase<UserInfoViewModel>()
             {
