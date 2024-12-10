@@ -9,6 +9,7 @@ builder.AddMediatrCommands();
 builder.AddFluentValidationValidators();
 builder.AddMapper();
 builder.AddSwaggerDocs();
+builder.AddJwtAuth();
 
 var app = builder.Build();
 
