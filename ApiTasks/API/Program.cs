@@ -10,6 +10,7 @@ builder.AddFluentValidationValidators();
 builder.AddMapper();
 builder.AddSwaggerDocs();
 builder.AddJwtAuth();
+builder.AddScopedServices();
 
 var app = builder.Build();
 

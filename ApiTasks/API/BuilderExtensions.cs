@@ -10,6 +10,8 @@ using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Application.Services.Interfaces;
+using Application.Services;
 
 namespace API
 {
@@ -93,6 +95,11 @@ namespace API
                 options.Cookie.SameSite = SameSiteMode.Strict;
                 options.ExpireTimeSpan = TimeSpan.FromDays(7);
             });
+        }
+
+        public static void AddScopedServices(this WebApplicationBuilder builder)
+        {
+            builder.Services.AddScoped<IAuthService, AuthService>();
         }
     }
 }
