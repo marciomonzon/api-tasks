@@ -11,14 +11,14 @@ namespace Application.Mappings
         {
             CreateMap<CreateUserCommand, User>()
                 .ForMember(x => x.RefreshToken, x => x.AllowNull())
-                .ForMember(x => x.RefreshTokenExpirationTime, x => x.MapFrom(x => AddFiveDays()))
+                .ForMember(x => x.RefreshTokenExpirationTime, x => x.MapFrom(x => AddDays()))
                 .ForMember(x => x.PasswordHash, x => x.MapFrom(x => x.Password));
 
             CreateMap<User, UserInfoViewModel>()
                 .ForMember(x => x.TokenJwt, x => x.AllowNull());
         }
 
-        private DateTime AddFiveDays()
+        private DateTime AddDays()
         {
             return DateTime.Now.AddDays(10);
         }

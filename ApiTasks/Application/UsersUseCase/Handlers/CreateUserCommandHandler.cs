@@ -28,6 +28,7 @@ namespace Application.UsersUseCase.Handlers
         {
             var user = _mapper.Map<User>(request);
             user.RefreshToken = _authService.GenerateRefreshToken();
+            user.PasswordHash = _authService.HashingPassword(user.PasswordHash!);
 
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
