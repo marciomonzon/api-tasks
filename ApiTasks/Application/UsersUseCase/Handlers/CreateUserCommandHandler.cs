@@ -27,6 +27,7 @@ namespace Application.UsersUseCase.Handlers
         public async Task<ResponseBase<UserInfoViewModel>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             var user = _mapper.Map<User>(request);
+            user.RefreshToken = _authService.GenerateRefreshToken();
 
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();

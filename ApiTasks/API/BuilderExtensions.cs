@@ -1,17 +1,17 @@
-﻿using Application.UsersUseCase.Commands;
+﻿using Application.Mappings;
+using Application.Services;
+using Application.Services.Interfaces;
+using Application.UsersUseCase.Commands;
 using Application.UsersUseCase.Validators;
-using FluentValidation.AspNetCore;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using Infrastructure.Persistence;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Application.Mappings;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using Application.Services.Interfaces;
-using Application.Services;
 
 namespace API
 {
