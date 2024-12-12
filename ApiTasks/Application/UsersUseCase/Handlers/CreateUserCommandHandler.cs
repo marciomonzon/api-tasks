@@ -4,6 +4,7 @@ using Application.UsersUseCase.Commands;
 using Application.UsersUseCase.ViewModels;
 using AutoMapper;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Persistence;
 using MediatR;
 
@@ -26,6 +27,10 @@ namespace Application.UsersUseCase.Handlers
 
         public async Task<ResponseBase<UserInfoViewModel>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
+            var validationResult = await ValidateUniqueUsernameAndEmailAsync(request);
+            if (validationResult is not null)
+                return validationResult;
+
             var user = _mapper.Map<User>(request);
             user.RefreshToken = _authService.GenerateRefreshToken();
             user.PasswordHash = _authService.HashingPassword(user.PasswordHash!);
@@ -43,6 +48,55 @@ namespace Application.UsersUseCase.Handlers
             };
 
             return userInfo;
+        }
+
+        private async Task<ResponseBase<UserInfoViewModel>> ValidateUniqueUsernameAndEmailAsync(CreateUserCommand request)
+        {
+            var isUniqueEmailAndUsername = await _authService.UniqueEmailAndUsernameAsync(request.Email!, request.Username!);
+
+            if (isUniqueEmailAndUsername is ValidationFieldsUserEnum.UsernameAndEmailUnavailable)
+            {
+                return new ResponseBase<UserInfoViewModel>
+                {
+                    ResponseInfo = new()
+                    {
+                        Title = "Username e Email indisponíveis.",
+                        ErrorDescription = "O username e o email apresentados já estão sendo utilizados. Tente outros.",
+                        HttpStatus = 400
+                    },
+                    Value = null!
+                };
+            }
+
+            if (isUniqueEmailAndUsername is ValidationFieldsUserEnum.EmailUnavailable)
+            {
+                return new ResponseBase<UserInfoViewModel>
+                {
+                    ResponseInfo = new()
+                    {
+                        Title = "Email indisponível.",
+                        ErrorDescription = "O Email apresentado já está sendo utilizado. Tente outro.",
+                        HttpStatus = 400
+                    },
+                    Value = null!
+                };
+            }
+
+            if (isUniqueEmailAndUsername is ValidationFieldsUserEnum.UsernameUnavailable)
+            {
+                return new ResponseBase<UserInfoViewModel>
+                {
+                    ResponseInfo = new()
+                    {
+                        Title = "Username indisponível.",
+                        ErrorDescription = "O username apresentado já está sendo utilizado. Tente outro.",
+                        HttpStatus = 400
+                    },
+                    Value = null!
+                };
+            }
+
+            return null!;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Application.Services.Interfaces;
 using Domain.Enums;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -71,19 +72,18 @@ namespace Application.Services
             return builder.ToString();
         }
 
-        public ValidationFieldsUserEnum UniqueEmailAndUsername(string email, string username)
+        public async Task<ValidationFieldsUserEnum> UniqueEmailAndUsernameAsync(string email, string username)
         {
-            var users = _context.Users.ToList();
-            var emailExists = users.Exists(x => x.Email == email);
-            var usernameExists = users.Exists(x => x.Username == username);
+            var isEmailExists = await _context.Users.FirstOrDefaultAsync(x => x.Email == email) != null;
+            var isUsernameExists = await _context.Users.FirstOrDefaultAsync(x => x.Username == username) != null;
 
-            if (emailExists && usernameExists)
+            if (isEmailExists && isUsernameExists)
                 return ValidationFieldsUserEnum.UsernameAndEmailUnavailable;
 
-            if (emailExists)
+            if (isEmailExists)
                 return ValidationFieldsUserEnum.EmailUnavailable;
 
-            if (usernameExists)
+            if (isUsernameExists)
                 return ValidationFieldsUserEnum.UsernameUnavailable;
 
             return ValidationFieldsUserEnum.FieldsOk;
