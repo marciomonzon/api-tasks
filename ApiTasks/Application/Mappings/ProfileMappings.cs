@@ -14,8 +14,10 @@ namespace Application.Mappings
                 .ForMember(x => x.RefreshTokenExpirationTime, x => x.MapFrom(x => AddDays()))
                 .ForMember(x => x.PasswordHash, x => x.MapFrom(x => x.Password));
 
-            CreateMap<User, UserInfoViewModel>()
+            CreateMap<User, RefreshTokenViewModel>()
                 .ForMember(x => x.TokenJwt, x => x.AllowNull());
+
+            CreateMap<RefreshTokenViewModel, UserInfoViewModel>();
         }
 
         private DateTime AddDays()

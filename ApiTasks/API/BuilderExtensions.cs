@@ -93,7 +93,7 @@ namespace API
                 options.Cookie.HttpOnly = true;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.SameSite = SameSiteMode.Strict;
-                options.ExpireTimeSpan = TimeSpan.FromDays(7);
+                options.ExpireTimeSpan = TimeSpan.FromDays(int.Parse(configuration["JWT:CookiesExpirationTime"]!));
             });
         }
 

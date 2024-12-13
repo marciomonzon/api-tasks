@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Application.UsersUseCase.Handlers
 {
-    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ResponseBase<UserInfoViewModel>>
+    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ResponseBase<RefreshTokenViewModel>>
     {
         private readonly TasksDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -25,7 +25,7 @@ namespace Application.UsersUseCase.Handlers
             _authService = authService;
         }
 
-        public async Task<ResponseBase<UserInfoViewModel>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        public async Task<ResponseBase<RefreshTokenViewModel>> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             var validationResult = await ValidateUniqueUsernameAndEmailAsync(request);
             if (validationResult is not null)
@@ -38,10 +38,10 @@ namespace Application.UsersUseCase.Handlers
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
 
-            var userMapped = _mapper.Map<UserInfoViewModel>(user);
+            var userMapped = _mapper.Map<RefreshTokenViewModel>(user);
             userMapped.TokenJwt = _authService.GenerateJWT(user.Email!, user.Username!);
 
-            var userInfo = new ResponseBase<UserInfoViewModel>()
+            var userInfo = new ResponseBase<RefreshTokenViewModel>()
             {
                 ResponseInfo = null,
                 Value = userMapped
@@ -50,13 +50,13 @@ namespace Application.UsersUseCase.Handlers
             return userInfo;
         }
 
-        private async Task<ResponseBase<UserInfoViewModel>> ValidateUniqueUsernameAndEmailAsync(CreateUserCommand request)
+        private async Task<ResponseBase<RefreshTokenViewModel>> ValidateUniqueUsernameAndEmailAsync(CreateUserCommand request)
         {
             var isUniqueEmailAndUsername = await _authService.UniqueEmailAndUsernameAsync(request.Email!, request.Username!);
 
             if (isUniqueEmailAndUsername is ValidationFieldsUserEnum.UsernameAndEmailUnavailable)
             {
-                return new ResponseBase<UserInfoViewModel>
+                return new ResponseBase<RefreshTokenViewModel>
                 {
                     ResponseInfo = new()
                     {
@@ -70,7 +70,7 @@ namespace Application.UsersUseCase.Handlers
 
             if (isUniqueEmailAndUsername is ValidationFieldsUserEnum.EmailUnavailable)
             {
-                return new ResponseBase<UserInfoViewModel>
+                return new ResponseBase<RefreshTokenViewModel>
                 {
                     ResponseInfo = new()
                     {
@@ -84,7 +84,7 @@ namespace Application.UsersUseCase.Handlers
 
             if (isUniqueEmailAndUsername is ValidationFieldsUserEnum.UsernameUnavailable)
             {
-                return new ResponseBase<UserInfoViewModel>
+                return new ResponseBase<RefreshTokenViewModel>
                 {
                     ResponseInfo = new()
                     {
