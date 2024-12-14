@@ -1,11 +1,15 @@
-﻿using Application.Mappings;
+﻿using Application.Interfaces.Repository;
+using Application.Interfaces.UnitOfWork;
+using Application.Mappings;
 using Application.Services;
 using Application.Services.Interfaces;
-using Application.UsersUseCase.Commands;
-using Application.UsersUseCase.Validators;
+using Application.UseCases.UsersUseCase.Commands;
+using Application.UseCases.UsersUseCase.Validators;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Persistence;
+using Infrastructure.Persistence.Repository;
+using Infrastructure.Persistence.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -100,6 +104,9 @@ namespace API
         public static void AddScopedServices(this WebApplicationBuilder builder)
         {
             builder.Services.AddScoped<IAuthService, AuthService>();
+
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         }
     }
 }

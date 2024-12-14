@@ -1,6 +1,6 @@
 ﻿using Application.Response;
-using Application.UsersUseCase.Commands;
-using Application.UsersUseCase.ViewModels;
+using Application.UseCases.UsersUseCase.Commands;
+using Application.UseCases.UsersUseCase.ViewModels;
 using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -54,24 +54,7 @@ namespace API.Controllers
 
             if (request.ResponseInfo is null && request.Value is not null)
             {
-                var cookieOptionsToken = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    Expires = DateTimeOffset.UtcNow.AddDays(7)
-                };
-
-                _ = int.TryParse(_configuration["JWT:RefreshTokenExpirationTimeInDays"], out int refreshTokenExpirationTimeInDays);
-
-                var cookieOptionsRefreshToken = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    Expires = DateTimeOffset.UtcNow.AddDays(refreshTokenExpirationTimeInDays)
-                };
-
-                Response.Cookies.Append("jwt", request.Value!.TokenJwt!, cookieOptionsToken);
-                Response.Cookies.Append("refreshToken", request.Value!.RefreshToken!, cookieOptionsRefreshToken);
+                HandleCookies(request);
                 return Ok(_mapper.Map<UserInfoViewModel>(request.Value));
             }
 
@@ -105,29 +88,13 @@ namespace API.Controllers
 
             if (request.ResponseInfo is null && request.Value is not null)
             {
-                var cookieOptionsToken = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    Expires = DateTimeOffset.UtcNow.AddDays(int.Parse(_configuration["JWT:CookiesExpirationTime"]!))
-                };
-
-                _ = int.TryParse(_configuration["JWT:RefreshTokenExpirationTimeInDays"], out int refreshTokenExpirationTimeInDays);
-
-                var cookieOptionsRefreshToken = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    Expires = DateTimeOffset.UtcNow.AddDays(refreshTokenExpirationTimeInDays)
-                };
-
-                Response.Cookies.Append("jwt", request.Value!.TokenJwt!, cookieOptionsToken);
-                Response.Cookies.Append("refreshToken", request.Value!.RefreshToken!, cookieOptionsRefreshToken);
+                HandleCookies(request);
                 return Ok(_mapper.Map<UserInfoViewModel>(request.Value));
             }
 
             return BadRequest(request);
         }
+
 
         [HttpPost("refreshToken")]
         public async Task<ActionResult<ResponseBase<UserInfoViewModel>>> RefreshTokenAsync(RefreshTokenCommand command)
@@ -140,28 +107,33 @@ namespace API.Controllers
 
             if (request.ResponseInfo is null && request.Value is not null)
             {
-                var cookieOptionsToken = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    Expires = DateTimeOffset.UtcNow.AddDays(7)
-                };
-
-                _ = int.TryParse(_configuration["JWT:RefreshTokenExpirationTimeInDays"], out int refreshTokenExpirationTimeInDays);
-
-                var cookieOptionsRefreshToken = new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    Expires = DateTimeOffset.UtcNow.AddDays(refreshTokenExpirationTimeInDays)
-                };
-
-                Response.Cookies.Append("jwt", request.Value!.TokenJwt!, cookieOptionsToken);
-                Response.Cookies.Append("refreshToken", request.Value!.RefreshToken!, cookieOptionsRefreshToken);
+                HandleCookies(request);
                 return Ok(_mapper.Map<UserInfoViewModel>(request.Value));
             }
 
             return BadRequest(request);
+        }
+
+        private void HandleCookies(ResponseBase<RefreshTokenViewModel> request)
+        {
+            var cookieOptionsToken = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
+            };
+
+            _ = int.TryParse(_configuration["JWT:RefreshTokenExpirationTimeInDays"], out int refreshTokenExpirationTimeInDays);
+
+            var cookieOptionsRefreshToken = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                Expires = DateTimeOffset.UtcNow.AddDays(refreshTokenExpirationTimeInDays)
+            };
+
+            Response.Cookies.Append("jwt", request.Value!.TokenJwt!, cookieOptionsToken);
+            Response.Cookies.Append("refreshToken", request.Value!.RefreshToken!, cookieOptionsRefreshToken);
         }
     }
 }

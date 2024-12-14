@@ -1,32 +1,35 @@
-﻿using Application.Response;
+﻿using Application.Interfaces.UnitOfWork;
+using Application.Response;
 using Application.Services.Interfaces;
-using Application.Services;
-using Application.UsersUseCase.Commands;
-using Application.UsersUseCase.ViewModels;
+using Application.UseCases.UsersUseCase.Commands;
+using Application.UseCases.UsersUseCase.ViewModels;
 using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 
-namespace Application.UsersUseCase.Handlers
+namespace Application.UseCases.UsersUseCase.Handlers
 {
     public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, ResponseBase<RefreshTokenViewModel>>
     {
         private readonly IAuthService _authService;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public LoginUserCommandHandler(IAuthService authService, 
+        public LoginUserCommandHandler(IAuthService authService,
                                        IConfiguration configuration,
-                                       IMapper mapper)
+                                       IMapper mapper,
+                                       IUnitOfWork unitOfWork)
         {
             _authService = authService;
             _configuration = configuration;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
-        public Task<ResponseBase<RefreshTokenViewModel>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+        public async Task<ResponseBase<RefreshTokenViewModel>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await _unitOfWork.UserRepository.Get(x => x.Email == request.Email);
+            var user = await _unitOfWork.UserRepository.GetAsync(x => x.Email == request.Email);
 
             if (user is null)
             {
@@ -38,7 +41,7 @@ namespace Application.UsersUseCase.Handlers
                         ErrorDescription = "Nenhum usuário encontrado com o email informado",
                         HttpStatus = 404
                     },
-                    Value = null
+                    Value = null!
                 };
             }
 
@@ -63,7 +66,7 @@ namespace Application.UsersUseCase.Handlers
             user.RefreshToken = _authService.GenerateRefreshToken();
             user.RefreshTokenExpirationTime = DateTime.Now.AddDays(refreshTokenValidityInDays);
 
-            await _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.UserRepository.UpdateAsync(user);
             _unitOfWork.Commit();
 
             RefreshTokenViewModel refreshTokenVM = _mapper.Map<RefreshTokenViewModel>(user);

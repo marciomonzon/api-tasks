@@ -1,7 +1,6 @@
-﻿using Application.Services.Interfaces;
+﻿using Application.Interfaces.UnitOfWork;
+using Application.Services.Interfaces;
 using Domain.Enums;
-using Infrastructure.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -14,12 +13,12 @@ namespace Application.Services
     public class AuthService : IAuthService
     {
         private readonly IConfiguration _configuration;
-        private readonly TasksDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public AuthService(IConfiguration configuration, TasksDbContext context)
+        public AuthService(IConfiguration configuration, IUnitOfWork unitOfWork)
         {
             _configuration = configuration;
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public string GenerateJWT(string email, string username)
@@ -74,8 +73,8 @@ namespace Application.Services
 
         public async Task<ValidationFieldsUserEnum> UniqueEmailAndUsernameAsync(string email, string username)
         {
-            var isEmailExists = await _context.Users.FirstOrDefaultAsync(x => x.Email == email) != null;
-            var isUsernameExists = await _context.Users.FirstOrDefaultAsync(x => x.Username == username) != null;
+            var isEmailExists = await _unitOfWork.UserRepository.GetAsync(x => x.Email == email) != null;
+            var isUsernameExists = await _unitOfWork.UserRepository.GetAsync(x => x.Username == username) != null;
 
             if (isEmailExists && isUsernameExists)
                 return ValidationFieldsUserEnum.UsernameAndEmailUnavailable;

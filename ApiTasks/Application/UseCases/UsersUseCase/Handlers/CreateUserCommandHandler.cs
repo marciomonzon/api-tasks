@@ -1,26 +1,26 @@
-﻿using Application.Response;
+﻿using Application.Interfaces.UnitOfWork;
+using Application.Response;
 using Application.Services.Interfaces;
-using Application.UsersUseCase.Commands;
-using Application.UsersUseCase.ViewModels;
+using Application.UseCases.UsersUseCase.Commands;
+using Application.UseCases.UsersUseCase.ViewModels;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Enums;
-using Infrastructure.Persistence;
 using MediatR;
 
-namespace Application.UsersUseCase.Handlers
+namespace Application.UseCases.UsersUseCase.Handlers
 {
     public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, ResponseBase<RefreshTokenViewModel>>
     {
-        private readonly TasksDbContext _dbContext;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IAuthService _authService;
 
-        public CreateUserCommandHandler(TasksDbContext dbContext,
+        public CreateUserCommandHandler(IUnitOfWork unitOfWork,
                                         IMapper mapper,
                                         IAuthService authService)
         {
-            _dbContext = dbContext;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
             _authService = authService;
         }
@@ -35,8 +35,8 @@ namespace Application.UsersUseCase.Handlers
             user.RefreshToken = _authService.GenerateRefreshToken();
             user.PasswordHash = _authService.HashingPassword(user.PasswordHash!);
 
-            await _dbContext.Users.AddAsync(user);
-            await _dbContext.SaveChangesAsync();
+            await _unitOfWork.UserRepository.CreateAsync(user);
+            await _unitOfWork.CommitAsync();
 
             var userMapped = _mapper.Map<RefreshTokenViewModel>(user);
             userMapped.TokenJwt = _authService.GenerateJWT(user.Email!, user.Username!);

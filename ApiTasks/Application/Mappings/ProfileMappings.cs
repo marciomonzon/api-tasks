@@ -1,5 +1,5 @@
-﻿using Application.UsersUseCase.Commands;
-using Application.UsersUseCase.ViewModels;
+﻿using Application.UseCases.UsersUseCase.Commands;
+using Application.UseCases.UsersUseCase.ViewModels;
 using AutoMapper;
 using Domain.Entities;
 

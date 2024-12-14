@@ -1,8 +1,8 @@
 ﻿using Application.Response;
-using Application.UsersUseCase.ViewModels;
+using Application.UseCases.UsersUseCase.ViewModels;
 using MediatR;
 
-namespace Application.UsersUseCase.Commands
+namespace Application.UseCases.UsersUseCase.Commands
 {
     public record LoginUserCommand : IRequest<ResponseBase<RefreshTokenViewModel>>
     {
