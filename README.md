@@ -1,5 +1,5 @@
 # API - Tasks
-ASP.NET API with Clean Arch and CQRS
+ASP.NET API with Clean Arch, CQRS and Mediatr.
 
 ## Technical Information
 * .NET 8;
