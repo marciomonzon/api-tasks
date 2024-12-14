@@ -7,4 +7,5 @@ ASP.NET API with Clean Arch and CQRS
 * Automapper;
 * Clean Architecture;
 * JWT Auth;
-* CQRS.
+* CQRS;
+* Mediatr.
